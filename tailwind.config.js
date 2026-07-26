@@ -1,0 +1,1 @@
+export default {content:["./index.html","./src/**/*.{js,ts,jsx,tsx}"],darkMode:"class",theme:{extend:{colors:{primary:{50:"#eef7ff",100:"#d9edff",200:"#bce0ff",300:"#8eccff",400:"#59b0ff",500:"#2d8eff",600:"#1a6df5",700:"#1358e1",800:"#1647b6",900:"#183e8f",950:"#142757"}},fontFamily:{sans:["Inter","system-ui","-apple-system","sans-serif"]}}},plugins:[]}
