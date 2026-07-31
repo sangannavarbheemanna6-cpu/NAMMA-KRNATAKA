@@ -4,3 +4,15 @@ dist
 *.local
 .env
 .env.*
+
+# Android / Capacitor
+android/app/build/
+android/build/
+android/.gradle/
+android/capacitor-cordova-android-plugins/
+android/app/src/main/assets/public/
+*.apk
+*.aab
+*.jks
+*.keystore
+local.properties
