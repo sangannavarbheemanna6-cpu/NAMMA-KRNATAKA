@@ -2,10 +2,16 @@
   "appId": "com.nammakarnataka.app",
   "appName": "NAMMA KARNATAKA",
   "webDir": "dist",
+  "bundledWebRuntime": false,
+  "backgroundColor": "#f9fafb",
   "server": {
-    "androidScheme": "https"
+    "androidScheme": "https",
+    "cleartext": true,
+    "allowNavigation": []
   },
   "android": {
-    "allowMixedContent": true
+    "allowMixedContent": true,
+    "captureInput": false,
+    "webContentsDebuggingEnabled": false
   }
 }
