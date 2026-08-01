@@ -7,18 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview",
-    "cap:add": "npx cap add",
-    "cap:sync": "npx cap sync",
-    "cap:open": "npx cap open android",
-    "cap:build": "npm run build && npx cap sync",
-    "cap:android": "npm run cap:build && npx cap open android",
-    "cap:release": "npm run build && npx cap sync && cd android && ./gradlew bundleRelease && echo 'AAB generated at android/app/build/outputs/bundle/release/app-release.aab'"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@capacitor/android": "^7.6.8",
-    "@capacitor/cli": "^7.6.8",
-    "@capacitor/core": "^7.6.8",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-icons": "^5.7.0",
