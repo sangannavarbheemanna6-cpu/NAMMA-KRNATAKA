@@ -8,18 +8,6 @@ export default function More(){var n=useNavigate();var s=useState(function(){try
 
 var linkGroups=[{title:R(T.en.all,T.kn.all),items:services},{title:R(T.en.quick,T.kn.quick),items:[{t:"Notifications",k:"ಅಧಿಸೂಚನೆಗಳು",p:"/notifications",e:"🔔"},{t:"Search",k:"ಹುಡುಕಿ",p:"/search",e:"🔍"},{t:"Settings",k:"ಸೆಟ್ಟಿಂಗ್‌ಗಳು",p:"/settings",e:"⚙️"}]},{title:R(T.en.info,T.kn.info),items:[{t:"Privacy Policy",k:"ಗೌಪ್ಯತಾ ನೀತಿ",p:"/privacy",e:"🛡️"},{t:"Terms",k:"ನಿಯಮಗಳು",p:"/terms",e:"📄"}]}];
 
-return{R(T.en.t,T.kn.t)}
-
-{linkGroups.map(function(group,gi){return{group.title}
-
-{group.items.map(function(item,i){return{item.e}{R(item.t,item.k)}})}
-
-})}
-
-{R(T.en.version,T.kn.version)}
-
-{R(T.en.built,T.kn.built)}
-
-{R(T.en.data,T.kn.data)}
-
-}
+return<div className="max-w-2xl mx-auto px-4 py-4"><div className="flex items-center gap-3 mb-6"><button onClick={function(){n("/")}} className="w-9 h-9 rounded-lg bg-white dark:bg-gray-800 shadow-sm border dark:border-gray-700 flex items-center justify-center text-gray-500"><HiArrowLeft size={18}/></button><h1 className="text-lg font-bold text-gray-800 dark:text-gray-100">{R(T.en.t,T.kn.t)}</h1></div>
+{linkGroups.map(function(group,gi){return<div key={gi} className="mb-5"><h3 className="text-xs font-bold text-gray-400 uppercase mb-2 px-1">{group.title}</h3><div className="grid grid-cols-2 gap-2">{group.items.map(function(item,i){return<button key={i} onClick={function(){n(item.p)}} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border dark:border-gray-700 hover:shadow-md transition-shadow text-left flex items-center gap-3"><span className="text-xl flex-shrink-0">{item.e}</span><span className="text-sm font-medium text-gray-800 dark:text-gray-200">{R(item.t,item.k)}</span></button>})}</div></div>})}
+<div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border dark:border-gray-700 text-center"><p className="text-xs text-gray-400">{R(T.en.version,T.kn.version)}</p><p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{R(T.en.built,T.kn.built)}</p><p className="text-[10px] text-gray-400 mt-2">{R(T.en.data,T.kn.data)}</p></div></div>}
