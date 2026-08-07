@@ -1,0 +1,26 @@
+import{useState,useEffect}from"react";import{useNavigate}from"react-router-dom";import{HiArrowLeft,HiSearch,HiStar,HiX,HiExternalLink,HiClock}from"react-icons/hi";import{T,services,cats}from"../data/govtData.js";
+var RK="nk_govfs";var SK="nk_govru";
+function lf(){try{return JSON.parse(localStorage.getItem(RK)||"[]")}catch(e){return[]}}
+function sf(a){try{localStorage.setItem(RK,JSON.stringify(a))}catch(e){}}
+function lr(){try{return JSON.parse(localStorage.getItem(SK)||"[]")}catch(e){return[]}}
+function sru(a){try{localStorage.setItem(SK,JSON.stringify(a.slice(0,8)))}catch(e){}}
+export default function GovtServices(){var n=useNavigate();var _l=useState(function(){try{return localStorage.getItem("nk_lang")||"bi"}catch(e){return"bi"}});var lg=_l[0],slg=_l[1];var R=function(e,k){if(lg==="en")return e;if(lg==="kn")return k;return e+" | "+k};
+var _sr=useState("");var q=_sr[0],sq=_sr[1];
+var _ct=useState("all");var cat=_ct[0],sc=_ct[1];
+var _fv=useState(lf());var favs=_fv[0],sfv=_fv[1];
+var _ru=useState(lr());var used=_ru[0],sused=_ru[1];
+var _tb=useState(false);var tf=_tb[0];
+useEffect(function(){var h=function(e){slg(e.detail)};window.addEventListener("langchange",h);return function(){window.removeEventListener("langchange",h)}},[]);
+var tfav=function(id){var nf;if(favs.includes(id))nf=favs.filter(function(f){return f!==id});else nf=[...favs,id];sfv(nf);sf(nf)};
+var open=function(s){var nu=[s.id].concat(used.filter(function(u){return u!==s.id}));sused(nu);sru(nu);window.open(s.url,"_blank")};
+var filt=services.filter(function(s){var ql=q.toLowerCase();var m=s.en.toLowerCase().includes(ql)||s.kn.includes(q);if(cat!=="all")m=m&&s.cat===cat;return m});
+var rf=function(){var u=lr();fv=lf();sused(u);sfv(fv)};
+var showF=favs.length>0&&cat==="all"&&!q;
+var flt=filt;if(showF)flt=flt.filter(function(s){return favs.includes(s.id)}).concat(flt.filter(function(s){return !favs.includes(s.id)}));
+return<div className="max-w-4xl mx-auto px-4 py-4">
+<div className="flex items-center gap-3 mb-4"><button onClick={function(){n("/")}} className="w-9 h-9 rounded-lg bg-white dark:bg-gray-800 shadow-sm border dark:border-gray-700 flex items-center justify-center text-gray-500"><HiArrowLeft size={18}/></button><div><h1 className="text-lg font-bold text-gray-800 dark:text-gray-100">{R(T.en.t,T.kn.t)}</h1><p className="text-[10px] text-gray-400">{R(T.en.st,T.kn.st)}</p></div></div>
+<div className="relative mb-3"><HiSearch className="absolute left-3 top-2.5 text-gray-400" size={16}/><input value={q} onChange={function(e){sq(e.target.value)}} placeholder={R(T.en.search,T.kn.search)} className="w-full pl-10 pr-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm"/>{q?<button onClick={function(){sq("")}} className="absolute right-2 top-2.5 text-gray-400"><HiX size={14}/></button>:null}</div>
+<div className="flex gap-1.5 overflow-x-auto pb-2 mb-3">{cats.map(function(c){return<button key={c.id} onClick={function(){sc(c.id)}} className={"flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap "+(cat===c.id?"bg-primary-600 text-white shadow":"bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border dark:border-gray-700")}>{c.icon?c.icon+" ":""}{R(c.en,c.kn)}</button>})}</div>
+{used.length>0&&cat==="all"&&!q?<div className="mb-3"><p className="text-xs text-gray-400 mb-1">{R(T.en.recent,T.kn.recent)}</p><div className="flex flex-wrap gap-1.5">{used.slice(0,6).map(function(id){var s=services.find(function(sv){return sv.id===id});if(!s)return null;return<button key={id} onClick={function(){open(s)}} className="flex items-center gap-1 px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-xs"><HiClock size={10} className="text-gray-400"/><span>{R(s.en,s.kn)}</span></button>})}</div></div>:null}
+{flt.length===0?<div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm text-center"><p className="text-gray-400">{R(T.en.noMatch,T.kn.noMatch)}</p></div>:<div className="space-y-2">{flt.map(function(s){var isF=favs.includes(s.id);return<div key={s.id} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border dark:border-gray-700 hover:shadow-md transition-shadow"><div className="flex items-start justify-between"><div className="flex-1 min-w-0"><div className="flex items-center gap-2"><h3 className="text-sm font-bold text-gray-800 dark:text-gray-100">{R(s.en,s.kn)}</h3><span className="text-[9px] bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-1.5 py-0.5 rounded-full font-medium">Official</span>{isF?<HiStar size={12} className="text-yellow-500"/>:null}</div><p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{s.desc}</p></div><button onClick={function(){tfav(s.id)}} className={"ml-2 flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center "+(isF?"text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20":"text-gray-300 hover:text-yellow-500")}><HiStar size={16}/></button></div><div className="flex gap-2 mt-3"><a href={s.url} target="_blank" rel="noopener" onClick={function(e){e.stopPropagation()}} className="flex-1 flex items-center justify-center gap-2 py-2 bg-primary-600 text-white rounded-lg text-xs font-medium hover:bg-primary-700 transition-colors"><HiExternalLink size={14}/>Visit Website</a></div></div>})}</div>}
+</div>}
