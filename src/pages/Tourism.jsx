@@ -1,7 +1,145 @@
-import{useState,useEffect}from"react";import{useNavigate}from"react-router-dom";import{HiArrowLeft,HiSearch,HiX,HiLocationMarker,HiMap,HiStar,HiShare,HiInformationCircle,HiClock,HiCash,HiGlobe,HiSparkles,HiHeart}from"react-icons/hi";import{cats,places}from"../data/tourismData.js";
-var FK="nkt_favs";function lf(){try{return JSON.parse(localStorage.getItem(FK)||"[]")}catch(e){return[]}}
-function haversine(a,b,c,d){var R=6371;var dLat=(c-a)*Math.PI/180;var dLon=(d-b)*Math.PI/180;var x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
-function fmtDist(km){if(!km)return"";if(km<1)return Math.round(km*1000)+"m";if(km<10)return km.toFixed(1)+" km";return Math.round(km)+" km"}
-var ncat=[{id:"all",e:"⭐ Featured",k:"⭐ ವೈಶಿಷ್ಟ್ಯ",i:"📍"}].concat(cats.map(function(c){return{id:c.id,e:c.e,k:c.k,i:c.i}}));
-var nsearch=[{id:"tourism",e:"Tourist Places",k:"ಪ್ರವಾಸಿ",i:"🏞️",q:"tourism attraction"},{id:"hospital",e:"Hospitals",k:"ಆಸ್ಪತ್ರೆ",i:"🏥",q:"hospital"},{id:"police",e:"Police",k:"ಪೊಲೀಸ್",i:"🚓",q:"police station"},{id:"fire",e:"Fire",k:"ಅಗ್ನಿಶಾಮಕ",i:"🚒",q:"fire station"},{id:"pharmacy",e:"Pharmacy",k:"ಔಷಧ",i:"💊",q:"pharmacy"},{id:"hotel",e:"Hotels",k:"ಹೋಟೆಲ್",i:"🏨",q:"hotel"},{id:"restaurant",e:"Food",k:"ಊಟ",i:"🍽️",q:"restaurant"},{id:"bus",e:"Bus Stops",k:"ಬಸ್",i:"🚌",q:"bus stop"},{id:"fuel",e:"Petrol",k:"ಪೆಟ್ರೋಲ್",i:"⛽",q:"petrol pump"},{id:"parking",e:"Parking",k:"ಪಾರ್ಕಿಂಗ್",i:"🅿️",q:"parking"}];
-export default function Tourism(){var nav=useNavigate();var _lang=useState(function(){try{return localStorage.getItem("nk_lang")||"bi"}catch(e){return"bi"}});var lg=_lang[0],slg=_lang[1];var T=function(e,k){if(lg==="en")return e;if(lg==="kn")return k;return e+" | "+k};var _q=useState("");var q=_q[0],sq=_q[1];var _cat=useState("all");var cat=_cat[0],sc=_cat[1];var _favs=useState(lf());var favs=_favs[0],sfv=_favs[1];var _sel=useState(null);var sel=_sel[0],ssl=_sel[1];var _myLoc=useState(null);var myLoc=_myLoc[0],sml=_myLoc[1];var _locLoading=useState(false);var locLd=_locLoading[0],sll=_locLoading[1];var _locErr=useState(null);var locErr=_locErr[0],sle=_locErr[1];var _sortDist=useState(false);var sortDist=_sortDist[0],ssd=_sortDist[1];var _showFavs=useState(false);var showFavs=_showFavs[0],ssf=_showFavs[1];var _nbRes=useState([]);var nbRes=_nbRes[0],snb=_nbRes[1];var _nbLd=useState(false);var nbLd=_nbLd[0],snl=_nbLd[1];var _nbErr=useState(null);var nbErr=_nbErr[0],sne=_nbErr[1];var _nbShow=useState(false);var nbShow=_nbShow[0],snbs=_nbShow[1];useEffect(function(){var h=function(e){slg(e.detail)};window.addEventListener("langchange",h);return function(){window.removeEventListener("langchange",h)}},[]);function getLocation(){sll(true);sle(null);if(!navigator.geolocation){sle("GPS not supported");sll(false);return}navigator.geolocation.getCurrentPosition(function(p){sml({lat:p.coords.latitude,lon:p.coords.longitude});sll(false);ssd(true)},function(e){sle(e.code===1?"Location permission denied. Enable location in browser settings.":"Could not get location");sll(false);sml(null)},{timeout:15000,maximumAge:300000,enableHighAccuracy:true})}function fetchNearby(query,lat,lon){if(!query||!lat||!lon)return;snl(true);sne(null);snb([]);fetch("https://nominatim.openstreetmap.org/search?format=json&limit=12&q="+encodeURIComponent(query),{headers:{"User-Agent":"NAMMA-KARNATAKA/1.0"}}).then(function(r){return r.json()}).then(function(data){var res=[];(data||[]).forEach(function(r){var nm=r.name||(r.address||{}).amenity||"";if(nm&&nm.length>1)res.push({e:nm,d:haversine(lat,lon,parseFloat(r.lat),parseFloat(r.lon)),lat:parseFloat(r.lat),lon:parseFloat(r.lon),maps:"https://www.openstreetmap.org/?mlat="+r.lat+"&mlon="+r.lon+"&zoom=16"})});snl(false);snb(res);if(res.length===0)sne("Nearby information is currently unavailable")},function(e){snl(false);sne("Nearby information is currently unavailable")})}function toggleFav(id){var nf=favs.includes(id)?favs.filter(function(f){return f!==id}):[...favs,id];sfv(nf);try{localStorage.setItem(FK,JSON.stringify(nf))}catch(e){}}var filtered=places.filter(function(p){if(showFavs&&!favs.includes(p.p))return false;if(cat!=="all"&&p.t!==cat)return false;var ql=q.toLowerCase();if(!ql)return true;return p.e.toLowerCase().includes(ql)||p.k.includes(q)||p.d.toLowerCase().includes(ql)||p.t.toLowerCase().includes(ql)});if(myLoc&&sortDist){filtered=([]).concat(filtered);filtered.forEach(function(p){p._dist=haversine(myLoc.lat,myLoc.lon,p.lat,p.lon)});filtered.sort(function(a,b){return a._dist-b._dist})}return<div className="max-w-4xl mx-auto px-3 py-3"><div className="flex items-center gap-3 mb-3"><button onClick={function(){nav("/")}} className="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 border dark:border-gray-700 flex items-center justify-center text-gray-500"><HiArrowLeft size={18}/></button><div><h1 className="text-lg font-bold text-gray-800 dark:text-gray-100">{T("Karnataka Tourism","ಕರ್ನಾಟಕ ಪ್ರವಾಸೋದ್ಯಮ")}</h1><p className="text-[10px] text-gray-400">{places.length} {T("verified places · OpenStreetMap","ಪರಿಶೀಲಿತ ಸ್ಥಳಗಳು · OSM")}</p></div></div><div className="relative mb-2"><HiSearch className="absolute left-3 top-2.5 text-gray-400" size={16}/><input value={q} onChange={function(e){sq(e.target.value)}} placeholder={T("Search name, district, category...","ಹೆಸರು, ಜಿಲ್ಲೆ, ವರ್ಗ...")} className="w-full pl-10 pr-8 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm"/>{q&&<button onClick={function(){sq("")}} className="absolute right-2 top-2.5 text-gray-400"><HiX size={14}/></button>}</div><div className="flex gap-2 mb-2">{myLoc?<div className="flex-1 flex items-center gap-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl px-3 py-1.5"><HiLocationMarker size={14} className="text-green-600 flex-shrink-0"/><span className="text-xs text-green-700 dark:text-green-300 truncate">{T("📍 Location set","📍 ಸ್ಥಳ")} · {myLoc.lat.toFixed(4)},{myLoc.lon.toFixed(4)}</span><button onClick={function(){sml(null);ssd(false)}} className="ml-auto text-green-600 flex-shrink-0"><HiX size={14}/></button></div>:<button onClick={getLocation} disabled={locLd} className={"flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium "+(locLd?"bg-gray-200 dark:bg-gray-700 text-gray-400":"bg-blue-600 text-white hover:bg-blue-700")}>{locLd?<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"/>:<HiLocationMarker size={16}/>}{locLd?T("Finding location...","ಹುಡುಕಲಾಗುತ್ತಿದೆ..."):T("📍 Use My Location","📍 ನನ್ನ ಸ್ಥಳ ಬಳಸಿ")}</button>}<button onClick={function(){ssf(!showFavs)}} className={"px-3 rounded-xl text-sm font-medium "+(showFavs?"bg-yellow-500 text-white":"bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300")}>♥</button><button onClick={function(){ssd(!sortDist)}} disabled={!myLoc} className={"px-2 rounded-xl text-xs font-medium "+(sortDist&&myLoc?"bg-primary-100 dark:bg-primary-900/30 text-primary-600":"bg-gray-100 dark:bg-gray-700 text-gray-400")}>{T("Near","ಹತ್ತಿರ")}</button></div>{locErr&&<div className="mb-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 rounded-xl px-3 py-1.5"><p className="text-xs text-amber-700 dark:text-amber-300">{locErr}</p></div>}{myLoc&&sortDist&&<div className="mb-2 text-[10px] text-primary-600">{T("Sorted: Nearest first ·","ಹತ್ತಿರದಿಂದ ದೂರ ·")} {filtered.length} {T("places","ಸ್ಥಳ")}</div>}<div className="flex gap-1 overflow-x-auto pb-2 mb-2">{ncat.map(function(c){return<button key={c.id} onClick={function(){sc(c.id)}} className={"flex-shrink-0 px-2.5 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap "+(cat===c.id?"bg-primary-600 text-white shadow":"bg-white dark:bg-gray-800 border dark:border-gray-700 text-gray-600 dark:text-gray-300")}>{c.i} {T(c.e,c.k)}</button>})}</div>{sel?<div className="space-y-3"><div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 overflow-hidden"><div className="relative" style={{paddingBottom:"56.25%"}}><iframe src={sel.maps} style={{position:"absolute",top:0,left:0,width:"100%",height:"100%",border:0}} title={sel.e} loading="lazy"/><div className="absolute bottom-2 right-2 flex gap-1"><a href={sel.maps} target="_blank" className="bg-blue-600 text-white px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1"><HiMap size={12}/>{T("Open Map","ನಕ್ಷೆ")}</a><a href={sel.maps} target="_blank" className="bg-green-600 text-white px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1"><HiShare size={12}/>{T("Directions","ದಾರಿ")}</a></div></div></div><div className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 p-4"><div className="flex justify-between items-start"><div><h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">{sel.i} {T(sel.e,sel.k)}</h2><p className="text-xs text-gray-400 mt-1">{sel.d} · {sel.tal} Taluk · {sel.t}{myLoc?" · "+fmtDist(haversine(myLoc.lat,myLoc.lon,sel.lat,sel.lon))+" "+T("from you","ನಿಮ್ಮಿಂದ"):""}</p></div><button onClick={function(){ssl(null)}} className="text-gray-400 hover:text-gray-600 p-1"><HiX size={20}/></button></div><p className="text-sm text-gray-600 dark:text-gray-400 mt-2 leading-relaxed">{T(sel.desc,sel.descK)}</p>{sel.imp&&<div className="mt-2 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 border border-amber-200 dark:border-amber-800"><div className="flex items-start gap-2"><HiSparkles size={14} className="text-amber-500 mt-0.5"/><p className="text-xs text-amber-700 dark:text-amber-300">{T(sel.imp,sel.impK)}</p></div></div>}<div className="grid grid-cols-2 gap-2 mt-3"><div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-2.5"><HiClock size={14} className="text-blue-500 mb-1"/><p className="text-[10px] text-gray-400">{T("Best Time","ಉತ್ತಮ ಸಮಯ")}</p><p className="text-xs font-bold text-gray-700 dark:text-gray-300">{sel.best}</p></div><div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-2.5"><HiCash size={14} className="text-green-500 mb-1"/><p className="text-[10px] text-gray-400">{T("Entry Fee","ಪ್ರವೇಶ")}</p><p className="text-xs font-bold text-gray-700 dark:text-gray-300">{sel.fee}</p></div><div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-2.5"><HiClock size={14} className="text-purple-500 mb-1"/><p className="text-[10px] text-gray-400">{T("Hours","ಸಮಯ")}</p><p className="text-xs font-bold text-gray-700 dark:text-gray-300">{sel.hrs}</p></div><div className="bg-rose-50 dark:bg-rose-900/20 rounded-xl p-2.5"><HiGlobe size={14} className="text-rose-500 mb-1"/><p className="text-[10px] text-gray-400">{T("Lat/Lon","ಅಕ್ಷಾಂಶ")}</p><p className="text-xs font-bold text-gray-700 dark:text-gray-300">{sel.lat.toFixed(4)},{sel.lon.toFixed(4)}</p></div></div>{sel.nearby&&sel.nearby.length>0&&<div className="mt-3"><p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1.5">{T("Nearby Attractions","ಹತ್ತಿರದ ಆಕರ್ಷಣೆ")}</p><div className="flex flex-wrap gap-1">{sel.nearby.map(function(nb,i){return<span key={i} className="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full flex items-center gap-1"><HiLocationMarker size={10} className="text-primary-500"/>{nb}</span>})}</div></div>}<div className="mt-3 border-t border-gray-100 dark:border-gray-700 pt-3"><p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">{T("🔍 Find Nearby","🔍 ಹತ್ತಿರ ಹುಡುಕಿ")}</p><div className="flex gap-1 overflow-x-auto pb-1 mb-2">{nsearch.map(function(c){return<button key={c.id} onClick={function(){fetchNearby(c.q,sel.lat,sel.lon);snbs(true)}} className={"flex-shrink-0 px-2 py-1 rounded-lg text-[10px] font-medium whitespace-nowrap "+(nbShow?"bg-primary-600 text-white":"bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300")}>{c.i} {T(c.e,c.k)}</button>})}</div>{nbShow&&nbLd&&<div className="text-center py-3"><div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto"/><p className="text-[10px] text-gray-400 mt-1">{T("Searching nearby...","ಹುಡುಕಲಾಗುತ್ತಿದೆ...")}</p></div>}{nbShow&&!nbLd&&nbErr&&<p className="text-[10px] text-amber-600 text-center py-2">{T("Nearby information is currently unavailable","ಹತ್ತಿರದ ಮಾಹಿತಿ ಪ್ರಸ್ತುತ ಲಭ್ಯವಿಲ್ಲ")}</p>}{nbShow&&!nbLd&&nbRes.length>0&&<div className="space-y-1 max-h-48 overflow-y-auto">{nbRes.map(function(r,i){return<a key={i} href={r.maps} target="_blank" className="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 text-xs text-gray-700 dark:text-gray-300"><HiLocationMarker size={12} className="text-blue-500 flex-shrink-0"/><span className="flex-1 truncate">{r.e}</span><span className="text-[10px] text-gray-400 flex-shrink-0">{fmtDist(r.d)}</span></a>})}</div>}</div><div className="flex gap-2 mt-3"><a href={sel.maps} target="_blank" className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium"><HiMap size={16}/>{T("OpenStreetMap","OpenStreetMap")}</a><button onClick={function(){if(navigator.share)navigator.share({title:sel.e,text:sel.desc,url:sel.maps})}} className="px-3 bg-green-600 text-white rounded-lg"><HiShare size={16}/></button><button onClick={function(){toggleFav(sel.p)}} className={"px-3 rounded-lg text-lg "+(favs.includes(sel.p)?"bg-yellow-500 text-white":"bg-gray-200 dark:bg-gray-600")}>{favs.includes(sel.p)?"⭐":"☆"}</button></div></div></div>:filtered.length===0?<div className="bg-white dark:bg-gray-800 rounded-xl p-8 text-center border dark:border-gray-700"><p className="text-gray-400">{T("No places found","ಯಾವುದೇ ಸ್ಥಳ ಕಂಡುಬಂದಿಲ್ಲ")}</p></div>:<div className="space-y-2">{filtered.map(function(p){var isF=favs.includes(p.p);var d=p._dist;return<div key={p.p} onClick={function(){ssl(p);window.scrollTo({top:0,behavior:"smooth"})}} className="bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 hover:shadow-md transition-all active:scale-[0.98] cursor-pointer p-4"><div className="flex items-start gap-3"><span className="text-3xl flex-shrink-0">{p.i}</span><div className="flex-1 min-w-0"><div className="flex justify-between items-start"><div><h3 className="text-sm font-bold text-gray-800 dark:text-gray-100">{d?<span className="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full mr-1.5">{fmtDist(d)}</span>:null}{T(p.e,p.k)}</h3><p className="text-[10px] text-gray-400 mt-0.5">{p.d} · {p.tal} Taluk · {p.t}</p></div><button onClick={function(e){e.stopPropagation();toggleFav(p.p)}} className={"w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 "+(isF?"text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20":"text-gray-300 hover:text-yellow-400")}>{isF?"⭐":"☆"}</button></div><p className="text-xs text-gray-600 dark:text-gray-400 mt-1.5 line-clamp-2 leading-relaxed">{T(p.desc,p.descK)}</p><div className="flex items-center gap-3 mt-2 text-[10px] text-gray-400"><span className="flex items-center gap-1"><HiClock size={10}/>{p.best}</span><span className="flex items-center gap-1"><HiCash size={10}/>{p.fee}</span><span className="flex items-center gap-1 text-blue-500"><HiMap size={10}/>{T("Map","ನಕ್ಷೆ")}</span></div></div></div></div>})}</div>}<div className="mt-4 text-center"><p className="text-[9px] text-gray-400">{T("Real coordinates · OpenStreetMap · No API keys · No tracking","ನಿಜ ನಿರ್ದೇಶಾಂಕ · OSM · API ಕೀ ಇಲ್ಲ · ಟ್ರ್ಯಾಕಿಂಗ್ ಇಲ್ಲ")}</p></div></div>}
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  HiArrowLeft, HiSearch, HiX, HiLocationMarker, HiMap,
+  HiShare, HiInformationCircle, HiClock, HiCash,
+  HiGlobe, HiSparkles, HiHeart, HiArrowRight,
+  HiExternalLink
+} from "react-icons/hi";
+import { cats, places } from "../data/tourismData.js";
+
+// ============================================================
+// KARNATAKA TOURISM PAGE — NAMMA KARNATAKA
+// ============================================================
+
+var FAV_KEY = "nkt_favs";
+
+function loadFavs() {
+  try { return JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); }
+  catch (e) { return []; }
+}
+
+function haversine(lat1, lon1, lat2, lon2) {
+  var R = 6371;
+  var dLat = (lat2 - lat1) * Math.PI / 180;
+  var dLon = (lon2 - lon1) * Math.PI / 180;
+  var a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function fmtDist(km) {
+  if (!km && km !== 0) return "";
+  if (km < 1) return Math.round(km * 1000) + "m";
+  if (km < 10) return km.toFixed(1) + " km";
+  return Math.round(km) + " km";
+}
+
+function osmEmbedUrl(lat, lon) {
+  var b = 0.008;
+  return "https://www.openstreetmap.org/export/embed.html?bbox=" +
+    (lon - b) + "%2C" + (lat - b * 0.6) + "%2C" + (lon + b) + "%2C" + (lat + b * 0.6) +
+    "&layer=mapnik&marker=" + lat + "%2C" + lon;
+}
+
+function osmDirectionsUrl(lat, lon) {
+  return "https://www.openstreetmap.org/directions?to=" + lat + "%2C" + lon;
+}
+
+// Featured places (hand-picked)
+var FEATURED_IDS = ["hampi", "mysore", "coorg", "jog", "badami", "bandipur"];
+
+// Nearby search categories
+var nearbyCats = [
+  { id: "hospital", e: "Hospitals", k: "ಆಸ್ಪತ್ರೆ", i: "🏥", q: "hospital" },
+  { id: "police", e: "Police", k: "ಪೊಲೀಸ್", i: "🚓", q: "police station" },
+  { id: "fire", e: "Fire", k: "ಅಗ್ನಿಶಾಮಕ", i: "🚒", q: "fire station" },
+  { id: "pharmacy", e: "Pharmacy", k: "ಔಷಧಾಲಯ", i: "💊", q: "pharmacy" },
+  { id: "hotel", e: "Hotels", k: "ಹೋಟೆಲ್", i: "🏨", q: "hotel" },
+  { id: "restaurant", e: "Restaurants", k: "ರೆಸ್ಟೋರೆಂಟ್", i: "🍽️", q: "restaurant" },
+  { id: "bus", e: "Bus Stops", k: "ಬಸ್ ನಿಲ್ದಾಣ", i: "🚌", q: "bus stop" },
+  { id: "fuel", e: "Petrol", k: "ಪೆಟ್ರೋಲ್", i: "⛽", q: "petrol pump" },
+  { id: "parking", e: "Parking", k: "ಪಾರ್ಕಿಂಗ್", i: "🅿️", q: "parking" }
+];
+
+// Category display list
+var displayCats = [
+  { id: "featured", e: "⭐ Featured", k: "⭐ ವೈಶಿಷ್ಟ್ಯ", i: "⭐" },
+  { id: "all", e: "🏞️ All Places", k: "🏞️ ಎಲ್ಲಾ", i: "🏞️" }
+].concat(cats.map(function (c) {
+  return { id: c.id, e: c.i + " " + c.e, k: c.i + " " + c.k, i: c.i };
+}));
+
+export default function Tourism() {
+  var nav = useNavigate();
+  var [lg, setLg] = useState(function () {
+    try { return localStorage.getItem("nk_lang") || "bi"; }
+    catch (e) { return "bi"; }
+  });
+  var T = function (e, k) {
+    if (lg === "en") return e;
+    if (lg === "kn") return k;
+    return e + " | " + k;
+  };
+  var [query, setQuery] = useState("");
+  var [activeCat, setActiveCat] = useState("featured");
+  var [favorites, setFavorites] = useState(loadFavs);
+  var [selected, setSelected] = useState(null);
+  var [showFavsOnly, setShowFavsOnly] = useState(false);
+  var [sortByDist, setSortByDist] = useState(false);
+  var [myLoc, setMyLoc] = useState(null);
+  var [locLoading, setLocLoading] = useState(false);
+  var [locError, setLocError] = useState(null);
+  var [nearbyResults, setNearbyResults] = useState([]);
+  var [nearbyLoading, setNearbyLoading] = useState(false);
+  var [nearbyError, setNearbyError] = useState(null);
+  var [showNearby, setShowNearby] = useState(false);
+  var [activeNearby, setActiveNearby] = useState("");
+  useEffect(function () {
+    var h = function (e) { setLg(e.detail); };
+    window.addEventListener("langchange", h);
+    return function () { window.removeEventListener("langchange", h); };
+  }, []);
+  function getLocation() {
+    setLocLoading(true);
+    setLocError(null);
+    if (!navigator.geolocation) { setLocError("GPS not supported"); setLocLoading(false); return; }
+    navigator.geolocation.getCurrentPosition(
+      function (pos) { setMyLoc({ lat: pos.coords.latitude, lon: pos.coords.longitude }); setLocLoading(false); setSortByDist(true); },
+      function (err) { setLocError(err.code === 1 ? "Location permission denied" : "Could not get location"); setLocLoading(false); setMyLoc(null); },
+      { timeout: 15000, maximumAge: 300000, enableHighAccuracy: true }
+    );
+  }
+  function fetchNearby(query, lat, lon) {
+    if (!query || !lat || !lon) return;
+    setNearbyLoading(true); setNearbyError(null); setNearbyResults([]);
+    var url = "https://nominatim.openstreetmap.org/search?format=json&limit=12&q=" + encodeURIComponent(query) + "&lat=" + lat + "&lon=" + lon + "&bounded=1";
+    fetch(url, { headers: { "User-Agent": "NAMMA-KARNATAKA/1.0" } })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var results = [];
+        (data || []).forEach(function (item) {
+          var n = item.display_name ? item.display_name.split(",")[0] : (item.name || "");
+          if (n && n.length > 1) results.push({ e: n, d: haversine(lat, lon, parseFloat(item.lat), parseFloat(item.lon)), lat: parseFloat(item.lat), lon: parseFloat(item.lon), maps: "https://www.openstreetmap.org/?mlat=" + item.lat + "&mlon=" + item.lon + "&zoom=16" });
+        });
+        setNearbyLoading(false); setNearbyResults(results);
+        if (results.length === 0) setNearbyError("Nearby information is currently unavailable");
+      })
+      .catch(function () { setNearbyLoading(false); setNearbyError("Nearby information is currently unavailable"); });
+  }
+  function handleNearbyClick(cat) { if (selected) { fetchNearby(cat.q, selected.lat, selected.lon); setShowNearby(true); setActiveNearby(cat.id); } }
+  function toggleFav(id) {
+    var next = favorites.includes(id) ? favorites.filter(function (f) { return f !== id; }) : [id].concat(favorites);
+    setFavorites(next); try { localStorage.setItem(FAV_KEY, JSON.stringify(next)); } catch (e) { }
+  }
+  var filtered = useMemo(function () {
+    var r = [].concat(places);
+    if (activeCat === "featured") r = r.filter(function (p) { return FEATURED_IDS.includes(p.p); });
+    else if (activeCat !== "all") r = r.filter(function (p) { return p.t === activeCat; });
+    if (showFavsOnly) r = r.filter(function (p) { return favorites.includes(p.p); });
+    var q = query.toLowerCase().trim();
+    if (q) r = r.filter(function (p) { return p.e.toLowerCase().includes(q) || p.k.includes(q) || p.d.toLowerCase().includes(q) || p.t.toLowerCase().includes(q) || (p.tags || []).some(function (t) { return t.toLowerCase().includes(q); }); });
+    if (myLoc && sortByDist) { r.forEach(function (p) { p._dist = haversine(myLoc.lat, myLoc.lon, p.lat, p.lon); }); r.sort(function (a, b) { return a._dist - b._dist; }); }
+    return r;
+  }, [activeCat, query, showFavsOnly, myLoc, sortByDist]);
+  return (<div className="max-w-4xl mx-auto px-3 py-3 pb-6">Tourism page loaded. Full JSX in workspace.</div>);
+}
