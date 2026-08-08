@@ -22,8 +22,7 @@ var services=[
 {id:"gescom",en:"GESCOM",kn:"ಗೆಸ್ಕಾಂ",url:"https://gescom.karnataka.gov.in",cat:"power",desc:"Gulbarga Electricity Supply. Bill payment, new connection."},
 {id:"cescom",en:"CESCOM",kn:"ಸೆಸ್ಕಾಂ",url:"https://cescom.karnataka.gov.in",cat:"power",desc:"Mysore Electricity Supply. Bill payment, new connection."},
 {id:"mescom",en:"MESCOM",kn:"ಮೆಸ್ಕಾಂ",url:"https://mescom.karnataka.gov.in",cat:"power",desc:"Mangalore Electricity Supply. Bill payment, new connection."},
-{id:"kpolice",en:"Karnataka Police",kn:"ಕರ್ನಾಟಕ ಪೊಲೀಸ್",url:"https://ksp.karnataka.gov.in",cat:"police",desc:"Online FIR, complaint status, character certificate, lost report."},
-{id:"traffic",en:"Traffic Alert",kn:"ಟ್ರಾಫಿಕ್ ಎಚ್ಚರಿಕೆ",url:"/traffic",cat:"police",desc:"Real-time traffic updates, road alerts, and congestion information."}
+{id:"kpolice",en:"Karnataka Police",kn:"ಕರ್ನಾಟಕ ಪೊಲೀಸ್",url:"https://ksp.karnataka.gov.in",cat:"police",desc:"Online FIR, complaint status, character certificate, lost report."}
 ];
 var cats=[
 {id:"all",en:"All",kn:"ಎಲ್ಲಾ"},
