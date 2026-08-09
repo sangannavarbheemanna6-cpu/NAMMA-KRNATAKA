@@ -13,7 +13,7 @@ export default defineConfig({
         id: '/',
         name: 'NAMMA KARNATAKA',
         short_name: 'Namma KTK',
-        description: 'Public Services Platform for Karnataka — weather, market prices, farmer hub, education, health, emergency services, and more.',
+        description: 'Public Services Platform for Karnataka',
         theme_color: '#1647b6',
         background_color: '#f9fafb',
         display: 'standalone',
@@ -35,11 +35,11 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        globPatterns: ['**/*.{js,css,html,svg,png,json}'],
         runtimeCaching: [
           { urlPattern: /open-meteo/, handler: 'NetworkFirst', options: { cacheName: 'weather', expiration: { maxAgeSeconds: 1800 } } },
           { urlPattern: /rss2json/, handler: 'NetworkFirst', options: { cacheName: 'news', expiration: { maxAgeSeconds: 600 } } },
-          { urlPattern: /data\.gov\.in/, handler: 'NetworkFirst', options: { cacheName: 'market', expiration: { maxAgeSeconds: 3600 } } },
           { urlPattern: /overpass-api/, handler: 'NetworkFirst', options: { cacheName: 'osm', expiration: { maxAgeSeconds: 3600 } } },
           { urlPattern: /fonts\.googleapis/, handler: 'CacheFirst', options: { cacheName: 'fonts', expiration: { maxAgeSeconds: 2592000 } } },
           { urlPattern: /fonts\.gstatic/, handler: 'CacheFirst', options: { cacheName: 'fonts-static', expiration: { maxAgeSeconds: 2592000 } } }
@@ -47,4 +47,4 @@ export default defineConfig({
       }
     })
   ]
-})
+});
