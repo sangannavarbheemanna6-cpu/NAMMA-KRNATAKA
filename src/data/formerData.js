@@ -998,7 +998,6 @@ export const FARMER_SCHEMES: Scheme[] = [
     url: "https://raitamitra.karnataka.gov.in"
   }
 ];
-
 /* =========================================================
    OFFICIAL PRICE SOURCES
 ========================================================= */
@@ -1010,8 +1009,7 @@ export const PRICE_SOURCES = {
   sujala:
     "https://sujala3lri.karnataka.gov.in/Dashboard/Index",
 
-  
-    
-agmarknet:                                
-"https//agmarknet.gov.in/"
-};   
+  agmarknet:
+    "https://agmarknet.gov.in/"
+};
+
