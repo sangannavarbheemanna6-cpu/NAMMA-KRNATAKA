@@ -1,13 +1,18 @@
 {
+  "id": "/",
   "name": "NAMMA KARNATAKA",
   "short_name": "Namma KTK",
-  "description": "Karnataka daily utility app",
+  "description": "Public Services Platform for Karnataka — weather, market prices, farmer hub, education, health, emergency services, and more.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": [
+    "standalone"
+  ],
   "orientation": "portrait",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "theme_color": "#1647b6",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.png",
