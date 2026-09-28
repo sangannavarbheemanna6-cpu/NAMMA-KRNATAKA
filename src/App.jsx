@@ -9,7 +9,6 @@ import News from "./pages/News";
 import EmergencyServices from "./pages/EmergencyServices";
 import Health from "./pages/Health";
 import Education from "./pages/Education";
-import EducationFinder from "./pages/EducationFinder";
 import Bus from "./pages/Bus";
 import YouthHub from "./pages/YouthHub";
 import Search from "./pages/Search";
@@ -34,7 +33,6 @@ export default function App() {
           <Route path="/emergency-services" element={<EmergencyServices />} />
           <Route path="/health" element={<Health />} />
           <Route path="/education" element={<Education />} />
-          <Route path="/education-finder" element={<EducationFinder />} />
           <Route path="/bus" element={<Bus />} />
           <Route path="/youth-hub" element={<YouthHub />} />
           <Route path="/govt-services" element={<GovtServices />} />
@@ -52,3 +50,4 @@ export default function App() {
     </ErrorBoundary>
   );
 }
+
