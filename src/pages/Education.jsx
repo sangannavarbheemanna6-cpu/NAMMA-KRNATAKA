@@ -1,410 +1,552 @@
+import{useState,useEffect}from"react";
+import{useNavigate}from"react-router-dom";
+import{HiArrowLeft,HiAcademicCap,HiExternalLink,HiRefresh}from"react-icons/hi";
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  HiArrowLeft,
-  HiAcademicCap,
-  HiExternalLink,
-  HiRefresh
-} from "react-icons/hi";
-
-const FEEDS = [
+const FEEDS=[
   {
-    id: "toi",
-    en: "TOI Education",
-    kn: "TOI ಶಿಕ್ಷಣ",
-    url: "https://timesofindia.indiatimes.com/rssfeeds/913168846.cms"
+    id:"toi",
+    en:"TOI Education",
+    kn:"TOI ಶಿಕ್ಷಣ",
+    url:"https://timesofindia.indiatimes.com/education"
   },
   {
-    id: "hindu",
-    en: "The Hindu",
-    kn: "ದಿ ಹಿಂದೂ",
-    url: "https://www.thehindu.com/education/feeder/default.rss"
+    id:"hindu",
+    en:"The Hindu Education",
+    kn:"ದಿ ಹಿಂದೂ ಶಿಕ್ಷಣ",
+    url:"https://www.thehindu.com/education/"
   }
 ];
 
-const LINKS = [
+const LINKS=[
   {
-    en: "NSP Scholarship Portal",
-    kn: "NSP ವಿದ್ಯಾರ್ಥಿವೇತನ ಪೋರ್ಟಲ್",
-    url: "https://scholarships.gov.in/",
-    d: "Apply for national scholarships",
-    dk: "ರಾಷ್ಟ್ರೀಯ ವಿದ್ಯಾರ್ಥಿವೇತನಕ್ಕೆ ಅರ್ಜಿ ಸಲ್ಲಿಸಿ"
+    id:"nsp",
+    en:"National Scholarship Portal (NSP)",
+    kn:"ರಾಷ್ಟ್ರೀಯ ವಿದ್ಯಾರ್ಥಿವೇತನ ಪೋರ್ಟಲ್ (NSP)",
+    url:"https://scholarships.gov.in/"
   },
   {
-    en: "SSP Scholarship Portal",
-    kn: "SSP ವಿದ್ಯಾರ್ಥಿವೇತನ ಪೋರ್ಟಲ್",
-    url: "https://ssp.karnataka.gov.in/",
-    d: "Karnataka State Scholarship Portal",
-    dk: "ಕರ್ನಾಟಕ ರಾಜ್ಯ ವಿದ್ಯಾರ್ಥಿವೇತನ ಪೋರ್ಟಲ್"
+    id:"ssp",
+    en:"State Scholarship Portal (SSP)",
+    kn:"ರಾಜ್ಯ ವಿದ್ಯಾರ್ಥಿವೇತನ ಪೋರ್ಟಲ್ (SSP)",
+    url:"https://ssp.postmatric.karnataka.gov.in/"
   },
   {
-    en: "DigiLocker",
-    kn: "ಡಿಜಿಲಾಕರ್",
-    url: "https://digilocker.gov.in/",
-    d: "Access digital documents",
-    dk: "ಡಿಜಿಟಲ್ ದಾಖಲೆಗಳನ್ನು ಪಡೆಯಿರಿ"
+    id:"digilocker",
+    en:"DigiLocker",
+    kn:"ಡಿಜಿಲಾಕರ್",
+    url:"https://www.digilocker.gov.in/"
   },
   {
-    en: "Karnataka School Education",
-    kn: "ಕರ್ನಾಟಕ ಶಾಲಾ ಶಿಕ್ಷಣ",
-    url: "https://schooleducation.karnataka.gov.in/",
-    d: "Official state education portal",
-    dk: "ರಾಜ್ಯ ಶಿಕ್ಷಣ ಇಲಾಖೆಯ ಅಧಿಕೃತ ಪೋರ್ಟಲ್"
+    id:"kseab",
+    en:"Karnataka School Education",
+    kn:"ಕರ್ನಾಟಕ ಶಾಲಾ ಶಿಕ್ಷಣ",
+    url:"https://schooleducation.karnataka.gov.in/"
   },
   {
-    en: "UGC - Higher Education",
-    kn: "UGC - ಉನ್ನತ ಶಿಕ್ಷಣ",
-    url: "https://www.ugc.ac.in/",
-    d: "University Grants Commission",
-    dk: "ವಿಶ್ವವಿದ್ಯಾಲಯ ಅನುದಾನ ಆಯೋಗ"
+    id:"ugc",
+    en:"UGC",
+    kn:"UGC",
+    url:"https://www.ugc.gov.in/"
   },
   {
-    en: "NCERT e-Pathshala",
-    kn: "NCERT ಇ-ಪಾಠಶಾಲಾ",
-    url: "https://epathshala.nic.in/",
-    d: "Free digital textbooks & resources",
-    dk: "ಉಚಿತ ಡಿಜಿಟಲ್ ಪಠ್ಯಪುಸ್ತಕಗಳು"
+    id:"ncert",
+    en:"NCERT e-Pathshala",
+    kn:"NCERT ಇ-ಪಾಠಶಾಲೆ",
+    url:"https://epathshala.nic.in/"
   },
   {
-    en: "SWAYAM Online Courses",
-    kn: "ಸ್ವಯಂ ಆನ್‌ಲೈನ್ ಕೋರ್ಸ್‌ಗಳು",
-    url: "https://swayam.gov.in/",
-    d: "Free online courses from top institutions",
-    dk: "ಪ್ರಮುಖ ಸಂಸ್ಥೆಗಳ ಉಚಿತ ಆನ್‌ಲೈನ್ ಕೋರ್ಸ್‌ಗಳು"
+    id:"swayam",
+    en:"SWAYAM",
+    kn:"SWAYAM ಆನ್‌ಲೈನ್ ಕೋರ್ಸ್‌ಗಳು",
+    url:"https://swayam.gov.in/"
   },
   {
-    en: "UDISE+ Know Your School",
-    kn: "UDISE+ ಶಾಲೆ ತಿಳಿಯಿರಿ",
-    url: "https://kys.udiseplus.gov.in/",
-    d: "Find schools by UDISE code",
-    dk: "UDISE ಕೋಡ್ ಮೂಲಕ ಶಾಲೆ ಹುಡುಕಿ"
+    id:"udise",
+    en:"UDISE+ Know Your School",
+    kn:"UDISE+ ನಿಮ್ಮ ಶಾಲೆಯನ್ನು ಹುಡುಕಿ",
+    url:"https://kys.udiseplus.gov.in/"
   },
   {
-    en: "School GIS Map",
-    kn: "ಶಾಲಾ GIS ನಕ್ಷೆ",
-    url: "https://schoolgis.nic.in/",
-    d: "Interactive school map",
-    dk: "ಶಾಲೆಗಳ ಸಂವಾದಾತ್ಮಕ ನಕ್ಷೆ"
+    id:"aglasem",
+    en:"AglaSem – NCERT Syllabus & Exam Question Papers",
+    kn:"AglaSem – NCERT ಪಠ್ಯಕ್ರಮ ಮತ್ತು ಪರೀಕ್ಷಾ ಪ್ರಶ್ನೆಪತ್ರಿಕೆಗಳು",
+    url:"https://aglasem.com/"
   }
 ];
 
-const T = {
-  en: {
-    t: "Education",
-    news: "Education News",
-    ld: "Loading articles...",
-    err: "Could not load articles.",
-    rf: "Refresh",
-    portals: "Education Portals",
-    read: "Read more",
-    n: "No articles available",
-    source: "Source"
+const T={
+  en:{
+    title:"Education",
+    subtitle:"Education services, portals, courses and latest updates",
+    portals:"Education Portals",
+    news:"Education News",
+    latest:"Latest",
+    refresh:"Refresh",
+    loading:"Loading latest education news...",
+    error:"Unable to load news right now.",
+    retry:"Try Again",
+    noNews:"No news available right now.",
+    back:"Back"
   },
-  kn: {
-    t: "ಶಿಕ್ಷಣ",
-    news: "ಶಿಕ್ಷಣ ಸುದ್ದಿ",
-    ld: "ಲೇಖನಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ...",
-    err: "ಲೇಖನಗಳು ಲೋಡ್ ಆಗಲಿಲ್ಲ.",
-    rf: "ಮತ್ತೆ ಲೋಡ್ ಮಾಡಿ",
-    portals: "ಶಿಕ್ಷಣ ಪೋರ್ಟಲ್‌ಗಳು",
-    read: "ಇನ್ನಷ್ಟು ಓದಿ",
-    n: "ಯಾವುದೇ ಲೇಖನಗಳು ಲಭ್ಯವಿಲ್ಲ",
-    source: "ಮೂಲ"
+  kn:{
+    title:"ಶಿಕ್ಷಣ",
+    subtitle:"ಶಿಕ್ಷಣ ಸೇವೆಗಳು, ಪೋರ್ಟಲ್‌ಗಳು, ಕೋರ್ಸ್‌ಗಳು ಮತ್ತು ಇತ್ತೀಚಿನ ಮಾಹಿತಿಗಳು",
+    portals:"ಶಿಕ್ಷಣ ಪೋರ್ಟಲ್‌ಗಳು",
+    news:"ಶಿಕ್ಷಣ ಸುದ್ದಿ",
+    latest:"ಇತ್ತೀಚಿನ",
+    refresh:"ರಿಫ್ರೆಶ್",
+    loading:"ಇತ್ತೀಚಿನ ಶಿಕ್ಷಣ ಸುದ್ದಿಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...",
+    error:"ಈಗ ಸುದ್ದಿಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ.",
+    retry:"ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+    noNews:"ಈಗ ಯಾವುದೇ ಸುದ್ದಿ ಲಭ್ಯವಿಲ್ಲ.",
+    back:"ಹಿಂದೆ"
   }
 };
 
-async function FF(url) {
-  const r = await fetch(
-    "https://api.rss2json.com/v1/api.json?rss_url=" +
-      encodeURIComponent(url)
+const timeAgo=(date,lang)=>{
+  const diff=Math.floor((Date.now()-new Date(date).getTime())/1000);
+
+  if(diff<60)return lang==="kn"?"ಈಗಷ್ಟೇ":"Just now";
+
+  const mins=Math.floor(diff/60);
+  if(mins<60)return lang==="kn"?`${mins} ನಿಮಿಷಗಳ ಹಿಂದೆ`:`${mins} min ago`;
+
+  const hours=Math.floor(mins/60);
+  if(hours<24)return lang==="kn"?`${hours} ಗಂಟೆಗಳ ಹಿಂದೆ`:`${hours} hr ago`;
+
+  const days=Math.floor(hours/24);
+  return lang==="kn"?`${days} ದಿನಗಳ ಹಿಂದೆ`:`${days} days ago`;
+};
+
+export default function Education(){
+
+  const navigate=useNavigate();
+
+  const[lang,setLang]=useState(
+    localStorage.getItem("nk_lang")||"en"
   );
 
-  const d = await r.json();
+  const[feed,setFeed]=useState("toi");
+  const[articles,setArticles]=useState([]);
+  const[loading,setLoading]=useState(true);
+  const[error,setError]=useState(false);
 
-  if (d.status !== "ok") {
-    throw Error("Failed to load news");
-  }
+  const t=T[lang];
 
-  return d.items.map(function (i) {
-    const desc = (i.description || "")
-      .replace(/<[^>]*>/g, "")
-      .substring(0, 200);
-
-    return {
-      title: i.title,
-      desc: desc,
-      link: i.link,
-      date: i.pubDate,
-      img:
-        i.thumbnail ||
-        (i.enclosure ? i.enclosure.link : null)
+  useEffect(()=>{
+    const change=()=>{
+      setLang(localStorage.getItem("nk_lang")||"en");
     };
-  }).slice(0, 10);
-}
 
-function timeAgo(d, lg) {
-  const ms = Date.now() - new Date(d).getTime();
-  const m = Math.floor(ms / 60000);
-  const h = Math.floor(m / 60);
-  const da = Math.floor(h / 24);
+    window.addEventListener("languagechange",change);
 
-  if (da > 0) {
-    return da + (lg === "kn" ? " ದಿನ" : "d");
-  }
+    return()=>{
+      window.removeEventListener("languagechange",change);
+    };
+  },[]);
 
-  if (h > 0) {
-    return h + (lg === "kn" ? " ಗಂಟೆ" : "h");
-  }
+  useEffect(()=>{
+    loadNews();
+  },[feed]);
 
-  if (m > 0) {
-    return m + (lg === "kn" ? " ನಿಮಿಷ" : "m");
-  }
+  const loadNews=async()=>{
+    setLoading(true);
+    setError(false);
 
-  return lg === "kn" ? "ಈಗ" : "Just now";
-}
+    try{
+      const selected=FEEDS.find(x=>x.id===feed);
 
-export default function Education() {
-  const n = useNavigate();
+      const api=
+        `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(selected.url)}`;
 
-  const [l, sl] = useState(function () {
-    try {
-      return localStorage.getItem("nk_lang") || "bi";
-    } catch (e) {
-      return "bi";
+      const res=await fetch(api);
+
+      if(!res.ok)throw new Error("Failed");
+
+      const data=await res.json();
+
+      if(data.status!=="ok")throw new Error("Feed error");
+
+      setArticles(
+        (data.items||[]).slice(0,20)
+      );
+    }catch(e){
+      setArticles([]);
+      setError(true);
+    }finally{
+      setLoading(false);
     }
-  });
-
-  const [feed, sf] = useState(FEEDS[0]);
-  const [arts, sa] = useState([]);
-  const [ld, sld] = useState(true);
-  const [er, ser] = useState(null);
-
-  const R = function (en, kn) {
-    if (l === "en") return en;
-    if (l === "kn") return kn;
-    return en + " | " + kn;
   };
 
-  useEffect(function () {
-    const h = function (e) {
-      sl(e.detail);
-    };
+  return(
+    <div
+      style={{
+        minHeight:"100vh",
+        background:"#f6f8fc",
+        color:"#111827",
+        paddingBottom:30
+      }}
+    >
 
-    window.addEventListener("langchange", h);
-
-    return function () {
-      window.removeEventListener("langchange", h);
-    };
-  }, []);
-
-  useEffect(function () {
-    let active = true;
-
-    async function load() {
-      sld(true);
-      ser(null);
-
-      try {
-        const a = await FF(feed.url);
-
-        if (active) {
-          sa(a);
-          sld(false);
-        }
-      } catch (e) {
-        if (active) {
-          ser("fetch");
-          sld(false);
-        }
-      }
-    }
-
-    load();
-
-    return function () {
-      active = false;
-    };
-  }, [feed]);
-
-  return (
-    <div className="max-w-2xl mx-auto px-4 py-4">
-
-      {/* Header */}
-
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={function () {
-              n("/");
-            }}
-            className="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 shadow-sm border dark:border-gray-700 flex items-center justify-center text-gray-500"
-          >
-            <HiArrowLeft size={20} />
-          </button>
-
-          <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-            <HiAcademicCap
-              className="inline text-cyan-600 mr-1"
-              size={23}
-            />
-            {R(T.en.t, T.kn.t)}
-          </h1>
-        </div>
-
-        <button
-          onClick={function () {
-            sf({ ...feed });
+      <div
+        style={{
+          position:"sticky",
+          top:0,
+          zIndex:20,
+          background:"#fff",
+          borderBottom:"1px solid #e5e7eb",
+          padding:"14px 16px"
+        }}
+      >
+        <div
+          style={{
+            maxWidth:900,
+            margin:"0 auto",
+            display:"flex",
+            alignItems:"center",
+            gap:12
           }}
-          className="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 shadow-sm border dark:border-gray-700 flex items-center justify-center text-cyan-600"
         >
-          <HiRefresh size={20} />
-        </button>
-      </div>
-
-      {/* Education Portals */}
-
-      <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase mb-3">
-        {R(T.en.portals, T.kn.portals)}
-      </h3>
-
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        {LINKS.map(function (li, i) {
-          return (
-            <a
-              key={i}
-              href={li.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between gap-1">
-                <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
-                  {R(li.en, li.kn)}
-                </p>
-
-                <HiExternalLink
-                  size={15}
-                  className="text-cyan-600 flex-shrink-0"
-                />
-              </div>
-
-              <p className="text-xs text-gray-400 mt-2 leading-5">
-                {R(li.d, li.dk)}
-              </p>
-            </a>
-          );
-        })}
-      </div>
-
-      {/* Education News */}
-
-      <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase mb-3">
-        {R(T.en.news, T.kn.news)}
-      </h3>
-
-      <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-none pb-1">
-        {FEEDS.map(function (f) {
-          return (
-            <button
-              key={f.id}
-              onClick={function () {
-                sf(f);
-              }}
-              className={
-                "flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all " +
-                (feed.id === f.id
-                  ? "bg-cyan-600 text-white shadow"
-                  : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border dark:border-gray-700")
-              }
-            >
-              {R(f.en, f.kn)}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Loading */}
-
-      {ld ? (
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border dark:border-gray-700 text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-cyan-600 border-t-transparent rounded-full mx-auto mb-3" />
-
-          <p className="text-sm text-gray-500">
-            {R(T.en.ld, T.kn.ld)}
-          </p>
-        </div>
-      ) : er ? (
-        <div className="bg-amber-50 dark:bg-amber-900/30 rounded-xl p-8 text-center">
-          <p className="text-amber-700 dark:text-amber-300 text-sm mb-4">
-            {R(T.en.err, T.kn.err)}
-          </p>
 
           <button
-            onClick={function () {
-              sf({ ...feed });
+            onClick={()=>navigate(-1)}
+            style={{
+              border:0,
+              background:"#eef2ff",
+              width:42,
+              height:42,
+              borderRadius:12,
+              display:"flex",
+              alignItems:"center",
+              justifyContent:"center",
+              cursor:"pointer"
             }}
-            className="px-4 py-2 bg-cyan-600 text-white rounded-lg text-sm font-medium"
           >
-            {R(T.en.rf, T.kn.rf)}
+            <HiArrowLeft size={22}/>
           </button>
+
+          <div
+            style={{
+              width:44,
+              height:44,
+              borderRadius:13,
+              background:"#1647b6",
+              color:"#fff",
+              display:"flex",
+              alignItems:"center",
+              justifyContent:"center"
+            }}
+          >
+            <HiAcademicCap size={25}/>
+          </div>
+
+          <div style={{flex:1}}>
+            <div
+              style={{
+                fontSize:20,
+                fontWeight:800
+              }}
+            >
+              {t.title}
+            </div>
+
+            <div
+              style={{
+                fontSize:12,
+                color:"#6b7280",
+                marginTop:2
+              }}
+            >
+              {t.subtitle}
+            </div>
+          </div>
+
         </div>
-      ) : arts.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border dark:border-gray-700 text-center">
-          <p className="text-sm text-gray-500">
-            {R(T.en.n, T.kn.n)}
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {arts.map(function (a, i) {
-            return (
+      </div>
+
+      <main
+        style={{
+          maxWidth:900,
+          margin:"0 auto",
+          padding:"18px 16px"
+        }}
+      >
+
+        <section>
+
+          <h2
+            style={{
+              fontSize:18,
+              margin:"4px 0 12px",
+              fontWeight:800
+            }}
+          >
+            {t.portals}
+          </h2>
+
+          <div
+            style={{
+              display:"grid",
+              gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",
+              gap:12
+            }}
+          >
+
+            {LINKS.map(item=>(
               <a
-                key={i}
-                href={a.link}
+                key={item.id}
+                href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border dark:border-gray-700 hover:shadow-md transition-shadow group"
+                style={{
+                  textDecoration:"none",
+                  color:"inherit",
+                  background:"#fff",
+                  border:"1px solid #e5e7eb",
+                  borderRadius:16,
+                  padding:16,
+                  display:"flex",
+                  alignItems:"center",
+                  gap:12,
+                  boxShadow:"0 2px 8px rgba(0,0,0,.04)"
+                }}
               >
-                <div className="flex gap-3">
-                  {a.img ? (
-                    <img
-                      src={a.img}
-                      alt=""
-                      className="w-20 h-20 rounded-lg object-cover flex-shrink-0 bg-gray-100"
-                      loading="lazy"
-                      onError={function (e) {
-                        e.target.style.display = "none";
-                      }}
-                    />
-                  ) : null}
 
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 line-clamp-2 group-hover:text-cyan-600 transition-colors">
-                      {a.title}
-                    </h3>
+                <div
+                  style={{
+                    width:42,
+                    height:42,
+                    borderRadius:12,
+                    background:"#eef2ff",
+                    color:"#1647b6",
+                    display:"flex",
+                    alignItems:"center",
+                    justifyContent:"center",
+                    flexShrink:0
+                  }}
+                >
+                  <HiAcademicCap size={22}/>
+                </div>
 
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-                      {a.desc}
-                    </p>
-
-                    <div className="flex items-center gap-3 mt-2">
-                      <span className="text-[10px] text-gray-400">
-                        {timeAgo(a.date, l)}
-                      </span>
-
-                      <span className="text-[10px] text-cyan-500 flex items-center gap-1">
-                        <HiExternalLink size={11} />
-                        {R(T.en.read, T.kn.read)}
-                      </span>
-                    </div>
+                <div style={{flex:1}}>
+                  <div
+                    style={{
+                      fontSize:14,
+                      fontWeight:750,
+                      lineHeight:1.35
+                    }}
+                  >
+                    {lang==="kn"?item.kn:item.en}
                   </div>
                 </div>
+
+                <HiExternalLink
+                  size={18}
+                  color="#6b7280"
+                />
+
               </a>
-            );
-          })}
-        </div>
-      )}
+            ))}
+
+          </div>
+        </section>
+
+        <section style={{marginTop:28}}>
+
+          <div
+            style={{
+              display:"flex",
+              alignItems:"center",
+              justifyContent:"space-between",
+              gap:10,
+              marginBottom:12
+            }}
+          >
+
+            <h2
+              style={{
+                fontSize:18,
+                margin:0,
+                fontWeight:800
+              }}
+            >
+              {t.news}
+            </h2>
+
+            <button
+              onClick={loadNews}
+              style={{
+                border:"1px solid #dbe2ea",
+                background:"#fff",
+                borderRadius:10,
+                padding:"8px 11px",
+                display:"flex",
+                alignItems:"center",
+                gap:6,
+                cursor:"pointer"
+              }}
+            >
+              <HiRefresh size={17}/>
+              <span style={{fontSize:12,fontWeight:700}}>
+                {t.refresh}
+              </span>
+            </button>
+
+          </div>
+
+          <div
+            style={{
+              display:"flex",
+              gap:8,
+              overflowX:"auto",
+              paddingBottom:8
+            }}
+          >
+
+            {FEEDS.map(item=>(
+              <button
+                key={item.id}
+                onClick={()=>setFeed(item.id)}
+                style={{
+                  border:"1px solid #dbe2ea",
+                  background:feed===item.id?"#1647b6":"#fff",
+                  color:feed===item.id?"#fff":"#374151",
+                  borderRadius:10,
+                  padding:"9px 13px",
+                  whiteSpace:"nowrap",
+                  cursor:"pointer",
+                  fontWeight:700,
+                  fontSize:13
+                }}
+              >
+                {lang==="kn"?item.kn:item.en}
+              </button>
+            ))}
+
+          </div>
+
+          {loading&&(
+            <div
+              style={{
+                background:"#fff",
+                borderRadius:16,
+                padding:25,
+                textAlign:"center",
+                color:"#6b7280",
+                border:"1px solid #e5e7eb"
+              }}
+            >
+              {t.loading}
+            </div>
+          )}
+
+          {!loading&&error&&(
+            <div
+              style={{
+                background:"#fff",
+                borderRadius:16,
+                padding:25,
+                textAlign:"center",
+                border:"1px solid #e5e7eb"
+              }}
+            >
+              <div
+                style={{
+                  color:"#6b7280",
+                  marginBottom:12
+                }}
+              >
+                {t.error}
+              </div>
+
+              <button
+                onClick={loadNews}
+                style={{
+                  border:0,
+                  background:"#1647b6",
+                  color:"#fff",
+                  padding:"10px 16px",
+                  borderRadius:10,
+                  fontWeight:700,
+                  cursor:"pointer"
+                }}
+              >
+                {t.retry}
+              </button>
+            </div>
+          )}
+
+          {!loading&&!error&&articles.length===0&&(
+            <div
+              style={{
+                background:"#fff",
+                borderRadius:16,
+                padding:25,
+                textAlign:"center",
+                color:"#6b7280",
+                border:"1px solid #e5e7eb"
+              }}
+            >
+              {t.noNews}
+            </div>
+          )}
+
+          {!loading&&!error&&articles.length>0&&(
+            <div
+              style={{
+                display:"grid",
+                gap:12
+              }}
+            >
+
+              {articles.map((article,index)=>(
+                <a
+                  key={article.guid||article.link||index}
+                  href={article.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    textDecoration:"none",
+                    color:"inherit",
+                    background:"#fff",
+                    border:"1px solid #e5e7eb",
+                    borderRadius:16,
+                    padding:16,
+                    display:"block"
+                  }}
+                >
+
+                  <div
+                    style={{
+                      fontSize:15,
+                      fontWeight:800,
+                      lineHeight:1.4,
+                      marginBottom:8
+                    }}
+                  >
+                    {article.title}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize:12,
+                      color:"#6b7280"
+                    }}
+                  >
+                    {article.pubDate
+                      ?timeAgo(article.pubDate,lang)
+                      :t.latest}
+                  </div>
+
+                </a>
+              ))}
+
+            </div>
+          )}
+
+        </section>
+
+      </main>
     </div>
   );
 }
