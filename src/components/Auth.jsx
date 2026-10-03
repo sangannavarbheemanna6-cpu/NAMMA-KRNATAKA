@@ -3,8 +3,8 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
+  getAuth,
 } from "firebase/auth";
-import { getAuth } from "firebase/auth";
 import app from "../firebase";
 
 const auth = getAuth(app);
@@ -17,7 +17,6 @@ export default function Auth() {
   const login = async () => {
     try {
       setLoading(true);
-
       const result = await signInWithPopup(auth, provider);
       setUser(result.user);
     } catch (error) {
