@@ -1,9 +1,5 @@
-import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-import app from "./firebase";
-import Auth from "./components/Auth";
+import { Routes, Route } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import AppLayout from "./layout/AppLayout";
 
@@ -26,29 +22,7 @@ import GovtServices from "./pages/GovtServices";
 import Traffic from "./pages/Traffic";
 import Tourism from "./pages/Tourism";
 
-const auth = getAuth(app);
-
 export default function App() {
-  const [user, setUser] = useState(undefined);
-
-  useEffect(() => {
-    return onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-  }, []);
-
-  if (user === undefined) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  if (!user || !user.phoneNumber) {
-    return <Auth />;
-  }
-
   return (
     <ErrorBoundary>
       <Routes>
@@ -76,3 +50,4 @@ export default function App() {
     </ErrorBoundary>
   );
 }
+

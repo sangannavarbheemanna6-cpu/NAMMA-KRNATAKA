@@ -4,8 +4,6 @@ import {
   signInWithPopup,
   signOut,
   getAuth,
-  RecaptchaVerifier,
-  linkWithPhoneNumber,
 } from "firebase/auth";
 import app from "../firebase";
 
@@ -14,204 +12,77 @@ const provider = new GoogleAuthProvider();
 
 export default function Auth() {
   const [user, setUser] = useState(auth.currentUser);
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
-  const [confirmation, setConfirmation] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
-  const googleLogin = async () => {
+  const login = async () => {
     try {
       setLoading(true);
-      setMessage("");
 
       const result = await signInWithPopup(auth, provider);
       setUser(result.user);
     } catch (error) {
-      console.error(error);
-      setMessage("Google login failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+      console.error("Google login failed:", error);
 
-  const sendOTP = async () => {
-    if (!user) return;
-
-    if (!/^[6-9]\d{9}$/.test(phone)) {
-      setMessage("Enter a valid 10-digit mobile number.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setMessage("");
-
-      if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(
-          auth,
-          "recaptcha-container",
-          {
-            size: "invisible",
-          }
-        );
-      }
-
-      const result = await linkWithPhoneNumber(
-        user,
-        `+91${phone}`,
-        window.recaptchaVerifier
+      alert(
+        `Google login failed:\n\n${error.code || "Unknown error"}\n${
+          error.message || ""
+        }`
       );
-
-      setConfirmation(result);
-      setMessage("OTP sent successfully.");
-    } catch (error) {
-      console.error(error);
-      setMessage(error.message || "Failed to send OTP.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const verifyOTP = async () => {
-    if (!confirmation) return;
-
-    try {
-      setLoading(true);
-      setMessage("");
-
-      await confirmation.confirm(otp);
-
-      setMessage("Mobile number verified successfully.");
-    } catch (error) {
-      console.error(error);
-      setMessage("Invalid OTP. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const logout = async () => {
-    await signOut(auth);
-    setUser(null);
-    setConfirmation(null);
-    setPhone("");
-    setOtp("");
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      console.error("Logout failed:", error);
+
+      alert(
+        `Logout failed:\n\n${error.code || "Unknown error"}`
+      );
+    }
   };
 
-  return (
-    <div className="w-full max-w-md mx-auto p-5">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border dark:border-gray-700 p-6">
+  if (user) {
+    return (
+      <div className="flex items-center gap-3">
+        <img
+          src={user.photoURL || ""}
+          alt=""
+          className="w-10 h-10 rounded-full"
+        />
 
-        {!user ? (
-          <>
-            <h2 className="text-xl font-bold text-center mb-2">
-              NAMMA KARNATAKA
-            </h2>
-
-            <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
-              Login to continue
-            </p>
-
-            <button
-              onClick={googleLogin}
-              disabled={loading}
-              className="w-full py-3 rounded-xl bg-black text-white font-semibold"
-            >
-              {loading ? "Please wait..." : "Continue with Google"}
-            </button>
-          </>
-        ) : !user.phoneNumber ? (
-          <>
-            <h2 className="text-xl font-bold mb-2">
-              Verify Mobile Number
-            </h2>
-
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-5">
-              ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ಪರಿಶೀಲಿಸಿ / Verify your mobile number
-            </p>
-
-            {!confirmation ? (
-              <>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) =>
-                    setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
-                  }
-                  placeholder="10-digit mobile number"
-                  className="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 mb-3"
-                />
-
-                <button
-                  onClick={sendOTP}
-                  disabled={loading}
-                  className="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold"
-                >
-                  {loading ? "Sending OTP..." : "Send OTP"}
-                </button>
-              </>
-            ) : (
-              <>
-                <input
-                  type="text"
-                  value={otp}
-                  onChange={(e) =>
-                    setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
-                  }
-                  placeholder="Enter OTP"
-                  className="w-full p-3 rounded-xl border dark:bg-gray-700 dark:border-gray-600 mb-3"
-                />
-
-                <button
-                  onClick={verifyOTP}
-                  disabled={loading}
-                  className="w-full py-3 rounded-xl bg-green-600 text-white font-semibold"
-                >
-                  {loading ? "Verifying..." : "Verify OTP"}
-                </button>
-              </>
-            )}
-
-            <button
-              onClick={logout}
-              className="w-full mt-3 py-2 text-sm text-red-600"
-            >
-              Logout
-            </button>
-
-            <div id="recaptcha-container"></div>
-          </>
-        ) : (
-          <>
-            <h2 className="text-xl font-bold text-center mb-2">
-              Welcome 👋
-            </h2>
-
-            <p className="text-center text-gray-600 dark:text-gray-300">
-              {user.displayName || user.email}
-            </p>
-
-            <p className="text-center text-green-600 mt-3">
-              Mobile verified ✓
-            </p>
-
-            <button
-              onClick={logout}
-              className="w-full mt-6 py-3 rounded-xl bg-red-600 text-white font-semibold"
-            >
-              Logout
-            </button>
-          </>
-        )}
-
-        {message && (
-          <p className="text-center text-sm mt-4 text-gray-600 dark:text-gray-300">
-            {message}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
+            {user.displayName || "Google User"}
           </p>
-        )}
 
+          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+            {user.email}
+          </p>
+        </div>
+
+        <button
+          onClick={logout}
+          className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm"
+        >
+          Logout
+        </button>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={login}
+      disabled={loading}
+      className="w-full px-4 py-3 rounded-xl bg-blue-600 text-white font-medium disabled:opacity-60"
+    >
+      {loading ? "Signing in..." : "Continue with Google"}
+    </button>
   );
 }
+
