@@ -17,11 +17,17 @@ export default function Auth() {
   const login = async () => {
     try {
       setLoading(true);
+
       const result = await signInWithPopup(auth, provider);
       setUser(result.user);
     } catch (error) {
       console.error("Google login failed:", error);
-      alert("Google login failed. Please try again.");
+
+      alert(
+        `Google login failed:\n\n${error.code || "Unknown error"}\n${
+          error.message || ""
+        }`
+      );
     } finally {
       setLoading(false);
     }
@@ -33,6 +39,10 @@ export default function Auth() {
       setUser(null);
     } catch (error) {
       console.error("Logout failed:", error);
+
+      alert(
+        `Logout failed:\n\n${error.code || "Unknown error"}`
+      );
     }
   };
 
@@ -75,3 +85,4 @@ export default function Auth() {
     </button>
   );
 }
+
