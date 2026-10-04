@@ -9,7 +9,6 @@ import {
   HiShieldCheck,
   HiInformationCircle,
 } from "react-icons/hi";
-import Auth from "../components/Auth";
 
 const T = {
   en: {
@@ -176,7 +175,6 @@ export default function Settings() {
             {R(T.en.accountDesc, T.kn.accountDesc)}
           </p>
 
-          <Auth />
         </div>
 
         {/* THEME */}
