@@ -1,7 +1,7 @@
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import app from "./firebase";
 
-const VAPID_KEY = "";
+const VAPID_KEY = "BMdlZGwMnGXnD_YGcaykCwW4wKXSyZskw_PQPNkMvyGdVRSJF2UIiHYwUyPvCdKZng1MQNXE_vElhNNFhHF8DTg";
 
 export async function initWebPush() {
   try {
