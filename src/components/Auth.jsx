@@ -3,6 +3,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
+  onAuthStateChanged,
   getAuth,
 } from "firebase/auth";
 import app from "../firebase";
@@ -16,9 +17,47 @@ export default function Auth({ onAuthenticated }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const timer = setTimeout(() => setStep("welcome"), 5000);
-    return () => clearTimeout(timer);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (auth.currentUser) {
+        setUser(auth.currentUser);
+        onAuthenticated?.();
+      } else {
+        setStep("welcome");
+      }
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [onAuthenticated]);
+
+  const loginWithGoogle = async () => {
+    try {
+      setError("");
+
+      const result = await signInWithPopup(auth, provider);
+
+      setUser(result.user);
+      setStep("splash");
+
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
+      onAuthenticated?.();
+    } catch (err) {
+      console.error(err);
+      setError(err?.message || "Google login failed.");
+    }
+  };
 
   const logout = async () => {
     try {
@@ -30,23 +69,6 @@ export default function Auth({ onAuthenticated }) {
       console.error(err);
       setError(err?.message || "Logout failed.");
     }
-  };
-
-  const loginWithGoogle = async () => {
-    try {
-      setError("");
-
-      const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
-      setStep("account");
-    } catch (err) {
-      console.error(err);
-      setError(err?.message || "Google login failed.");
-    }
-  };
-
-  const continueToApp = () => {
-    onAuthenticated?.();
   };
 
   if (step === "splash") {
@@ -68,23 +90,18 @@ export default function Auth({ onAuthenticated }) {
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
             NAMMA KARNATAKA
           </h1>
-
           <p className="mt-4 text-xl font-bold text-gray-800 dark:text-gray-100">
             ಸ್ವಾಗತ 🙏
           </p>
-
           <p className="mt-1 text-lg font-semibold text-gray-700 dark:text-gray-200">
             Welcome 🙏
           </p>
-
           <p className="mt-8 text-base text-gray-700 dark:text-gray-300">
             ಈ ಆ್ಯಪ್‌ನಲ್ಲಿ ಎಲ್ಲಾ ಸೇವೆಗಳನ್ನು ಪಡೆಯಿರಿ
           </p>
-
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Access all services available in this app
           </p>
-
           <button
             type="button"
             onClick={() => setStep("google")}
@@ -92,7 +109,6 @@ export default function Auth({ onAuthenticated }) {
           >
             ಮುಂದುವರಿಸಿ
           </button>
-
           <p className="mt-2 text-sm font-semibold text-gray-600 dark:text-gray-300">
             Continue
           </p>
@@ -108,7 +124,6 @@ export default function Auth({ onAuthenticated }) {
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
             NAMMA KARNATAKA
           </h1>
-
           <button
             type="button"
             onClick={loginWithGoogle}
@@ -116,11 +131,9 @@ export default function Auth({ onAuthenticated }) {
           >
             Google ಮೂಲಕ ಮುಂದುವರಿಸಿ
           </button>
-
           <p className="mt-2 text-sm font-semibold text-gray-600 dark:text-gray-300">
             Continue with Google
           </p>
-
           {error && (
             <p className="mt-6 text-sm text-red-600 break-words">
               {error}
@@ -131,51 +144,5 @@ export default function Auth({ onAuthenticated }) {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center px-6">
-      <div className="w-full max-w-md text-center">
-        <div className="w-full grid grid-cols-[minmax(0,1fr)_90px] items-center gap-3 mb-10">
-          <div className="min-w-0 text-left">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Google Account
-            </p>
-
-            <p className="text-sm font-semibold text-gray-900 dark:text-white break-all">
-              {user?.email}
-            </p>
-          </div>
-
-          <button
-            onClick={logout}
-            type="button"
-            className="w-[90px] h-10 rounded-lg bg-blue-600 text-white text-sm font-bold shadow-md"
-          >
-            Logout
-          </button>
-        </div>
-
-        <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
-          NAMMA KARNATAKA
-        </h1>
-
-        <button
-          type="button"
-          onClick={continueToApp}
-          className="mt-10 w-full py-3 rounded-xl bg-blue-600 text-white font-bold shadow-md"
-        >
-          ಮುಂದುವರಿಸಿ
-        </button>
-
-        <p className="mt-2 text-sm font-semibold text-gray-600 dark:text-gray-300">
-          Continue
-        </p>
-
-        {error && (
-          <p className="mt-6 text-sm text-red-600 break-words">
-            {error}
-          </p>
-        )}
-      </div>
-    </div>
-  );
+  return null;
 }

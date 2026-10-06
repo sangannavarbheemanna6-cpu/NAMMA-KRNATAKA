@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAuth, signOut } from "firebase/auth";
+import app from "../firebase";
 import {
   HiCloud,
   HiNewspaper,
@@ -111,8 +113,20 @@ var fks = [
   "ಮಕ್ಕಳ ದಿನ",
 ];
 
+const auth = getAuth(app);
+
 export default function Home() {
   const nav = useNavigate();
+  const user = auth.currentUser;
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      window.location.reload();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   const [g, setG] = useState("");
   const [d, setD] = useState("");
@@ -198,6 +212,23 @@ export default function Home() {
     <div className="max-w-5xl mx-auto px-4 py-5 space-y-5">
       <section className="bg-gradient-to-br from-orange-500 via-red-500 to-primary-700 rounded-2xl p-6 text-white shadow-lg">
         <p className="text-orange-100 text-sm font-medium">{d}</p>
+
+        <div className="mt-3 flex items-center gap-2 bg-white/15 rounded-xl p-2.5 backdrop-blur-sm">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] text-orange-100">Google Account</p>
+            <p className="text-xs font-semibold text-white truncate">
+              {user?.email || ""}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="shrink-0 px-3 py-2 rounded-lg bg-white text-red-600 text-xs font-bold shadow-sm"
+          >
+            Logout
+          </button>
+        </div>
 
         <h2 className="text-2xl font-bold mt-1">{g}</h2>
 
