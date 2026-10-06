@@ -9,7 +9,6 @@ import {
   HiShieldCheck,
   HiInformationCircle,
 } from "react-icons/hi";
-import Auth from "../components/Auth";
 
 const T = {
   en: {
@@ -22,9 +21,11 @@ const T = {
     en: "English",
     kn: "ಕನ್ನಡ",
     bi: "Bilingual",
-    account: "Account",
-    accountDesc:
-      "Sign in with Google to use your account across devices.",
+    notifications: "Notifications",
+    notificationsDesc:
+      "Enable notifications to receive important updates from NAMMA KARNATAKA.",
+    enableNotifications: "Enable Notifications",
+    notificationsEnabled: "Notifications Enabled",
     cache: "Storage",
     clearCache: "Clear Cache",
     cacheDesc: "Remove cached data and reload",
@@ -50,9 +51,11 @@ const T = {
     en: "ಇಂಗ್ಲಿಷ್",
     kn: "ಕನ್ನಡ",
     bi: "ದ್ವಿಭಾಷಾ",
-    account: "ಖಾತೆ",
-    accountDesc:
-      "ವಿವಿಧ ಸಾಧನಗಳಲ್ಲಿ ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಬಳಸಲು Google ಮೂಲಕ Sign in ಮಾಡಿ.",
+    notifications: "ಅಧಿಸೂಚನೆಗಳು",
+    notificationsDesc:
+      "NAMMA KARNATAKA ಯ ಪ್ರಮುಖ ಮಾಹಿತಿಗಾಗಿ ಅಧಿಸೂಚನೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.",
+    enableNotifications: "ಅಧಿಸೂಚನೆಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ",
+    notificationsEnabled: "ಅಧಿಸೂಚನೆಗಳು ಸಕ್ರಿಯವಾಗಿವೆ",
     cache: "ಶೇಖರಣೆ",
     clearCache: "ಶೇಖರಣೆ ಅಳಿಸಿ",
     cacheDesc: "ಶೇಖರಿಸಿದ ಡೇಟಾ ತೆಗೆದು ಮರುಲೋಡ್",
@@ -100,6 +103,17 @@ export default function Settings() {
   const cleared = _cl[0];
   const scleared = _cl[1];
 
+  const _np = useState(function () {
+    try {
+      return Notification.permission === "granted";
+    } catch (e) {
+      return false;
+    }
+  });
+
+  const notificationsEnabled = _np[0];
+  const setNotificationsEnabled = _np[1];
+
   useEffect(function () {
     const h = function (e) {
       sl(e.detail);
@@ -128,6 +142,28 @@ export default function Settings() {
       } else {
         document.documentElement.classList.remove("dark");
       }
+    }
+  };
+
+  const enableNotifications = async function () {
+    try {
+      const token = await initWebPush();
+
+      if (token) {
+        setNotificationsEnabled(true);
+        return;
+      }
+
+      try {
+        setNotificationsEnabled(
+          Notification.permission === "granted"
+        );
+      } catch (e) {
+        setNotificationsEnabled(false);
+      }
+    } catch (error) {
+      console.error("Notification button error:", error);
+      setNotificationsEnabled(false);
     }
   };
 
@@ -165,18 +201,31 @@ export default function Settings() {
 
       <div className="space-y-4">
 
-        {/* ACCOUNT */}
+        {/* NOTIFICATIONS */}
 
         <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border dark:border-gray-700">
           <h3 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-2">
-            {R(T.en.account, T.kn.account)}
+            {R(T.en.notifications, T.kn.notifications)}
           </h3>
 
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-            {R(T.en.accountDesc, T.kn.accountDesc)}
+            {R(T.en.notificationsDesc, T.kn.notificationsDesc)}
           </p>
 
-          <Auth />
+          <button
+            onClick={enableNotifications}
+            type="button"
+            className={
+              "w-full py-3 rounded-xl text-sm font-bold shadow transition-all " +
+              (notificationsEnabled
+                ? "bg-green-600 text-white"
+                : "bg-primary-600 text-white")
+            }
+          >
+            {notificationsEnabled
+              ? R(T.en.notificationsEnabled, T.kn.notificationsEnabled)
+              : R(T.en.enableNotifications, T.kn.enableNotifications)}
+          </button>
         </div>
 
         {/* THEME */}

@@ -1,7 +1,9 @@
-
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import AppLayout from "./layout/AppLayout";
+import Auth from "./components/Auth";
+import { initPushNotifications } from "./pushNotifications";
 
 import Home from "./pages/Home";
 import Weather from "./pages/Weather";
@@ -23,6 +25,20 @@ import Traffic from "./pages/Traffic";
 import Tourism from "./pages/Tourism";
 
 export default function App() {
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    initPushNotifications();
+  }, []);
+
+  if (!authenticated) {
+    return (
+      <ErrorBoundary>
+        <Auth onAuthenticated={() => setAuthenticated(true)} />
+      </ErrorBoundary>
+    );
+  }
+
   return (
     <ErrorBoundary>
       <Routes>
@@ -30,7 +46,10 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/weather" element={<Weather />} />
           <Route path="/news" element={<News />} />
-          <Route path="/emergency-services" element={<EmergencyServices />} />
+          <Route
+            path="/emergency-services"
+            element={<EmergencyServices />}
+          />
           <Route path="/health" element={<Health />} />
           <Route path="/education" element={<Education />} />
           <Route path="/bus" element={<Bus />} />
@@ -50,4 +69,3 @@ export default function App() {
     </ErrorBoundary>
   );
 }
-

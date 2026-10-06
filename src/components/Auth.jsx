@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -10,79 +10,172 @@ import app from "../firebase";
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-export default function Auth() {
-  const [user, setUser] = useState(auth.currentUser);
-  const [loading, setLoading] = useState(false);
+export default function Auth({ onAuthenticated }) {
+  const [step, setStep] = useState("splash");
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState("");
 
-  const login = async () => {
-    try {
-      setLoading(true);
-
-      const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
-    } catch (error) {
-      console.error("Google login failed:", error);
-
-      alert(
-        `Google login failed:\n\n${error.code || "Unknown error"}\n${
-          error.message || ""
-        }`
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => setStep("welcome"), 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const logout = async () => {
     try {
       await signOut(auth);
       setUser(null);
-    } catch (error) {
-      console.error("Logout failed:", error);
-
-      alert(
-        `Logout failed:\n\n${error.code || "Unknown error"}`
-      );
+      setError("");
+      setStep("welcome");
+    } catch (err) {
+      console.error(err);
+      setError(err?.message || "Logout failed.");
     }
   };
 
-  if (user) {
-    return (
-      <div className="flex items-center gap-3">
-        <img
-          src={user.photoURL || ""}
-          alt=""
-          className="w-10 h-10 rounded-full"
-        />
+  const loginWithGoogle = async () => {
+    try {
+      setError("");
 
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">
-            {user.displayName || "Google User"}
+      const result = await signInWithPopup(auth, provider);
+      setUser(result.user);
+      setStep("account");
+    } catch (err) {
+      console.error(err);
+      setError(err?.message || "Google login failed.");
+    }
+  };
+
+  const continueToApp = () => {
+    onAuthenticated?.();
+  };
+
+  if (step === "splash") {
+    return (
+      <div className="fixed inset-0 bg-white flex items-center justify-center">
+        <img
+          src="/namma-karnataka-splash.jpeg"
+          alt="NAMMA KARNATAKA"
+          className="max-w-full max-h-full object-contain"
+        />
+      </div>
+    );
+  }
+
+  if (step === "welcome") {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center px-6">
+        <div className="w-full max-w-md text-center">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
+            NAMMA KARNATAKA
+          </h1>
+
+          <p className="mt-4 text-xl font-bold text-gray-800 dark:text-gray-100">
+            ಸ್ವಾಗತ 🙏
           </p>
 
-          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-            {user.email}
+          <p className="mt-1 text-lg font-semibold text-gray-700 dark:text-gray-200">
+            Welcome 🙏
+          </p>
+
+          <p className="mt-8 text-base text-gray-700 dark:text-gray-300">
+            ಈ ಆ್ಯಪ್‌ನಲ್ಲಿ ಎಲ್ಲಾ ಸೇವೆಗಳನ್ನು ಪಡೆಯಿರಿ
+          </p>
+
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Access all services available in this app
+          </p>
+
+          <button
+            type="button"
+            onClick={() => setStep("google")}
+            className="mt-10 w-full py-3 rounded-xl bg-blue-600 text-white font-bold shadow-md"
+          >
+            ಮುಂದುವರಿಸಿ
+          </button>
+
+          <p className="mt-2 text-sm font-semibold text-gray-600 dark:text-gray-300">
+            Continue
           </p>
         </div>
+      </div>
+    );
+  }
 
-        <button
-          onClick={logout}
-          className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm"
-        >
-          Logout
-        </button>
+  if (step === "google") {
+    return (
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center px-6">
+        <div className="w-full max-w-md text-center">
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
+            NAMMA KARNATAKA
+          </h1>
+
+          <button
+            type="button"
+            onClick={loginWithGoogle}
+            className="mt-10 w-full py-3 rounded-xl bg-blue-600 text-white font-bold shadow-md"
+          >
+            Google ಮೂಲಕ ಮುಂದುವರಿಸಿ
+          </button>
+
+          <p className="mt-2 text-sm font-semibold text-gray-600 dark:text-gray-300">
+            Continue with Google
+          </p>
+
+          {error && (
+            <p className="mt-6 text-sm text-red-600 break-words">
+              {error}
+            </p>
+          )}
+        </div>
       </div>
     );
   }
 
   return (
-    <button
-      onClick={login}
-      disabled={loading}
-      className="w-full px-4 py-3 rounded-xl bg-blue-600 text-white font-medium disabled:opacity-60"
-    >
-      {loading ? "Signing in..." : "Continue with Google"}
-    </button>
+    <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center px-6">
+      <div className="w-full max-w-md text-center">
+        <div className="w-full grid grid-cols-[minmax(0,1fr)_90px] items-center gap-3 mb-10">
+          <div className="min-w-0 text-left">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Google Account
+            </p>
+
+            <p className="text-sm font-semibold text-gray-900 dark:text-white break-all">
+              {user?.email}
+            </p>
+          </div>
+
+          <button
+            onClick={logout}
+            type="button"
+            className="w-[90px] h-10 rounded-lg bg-blue-600 text-white text-sm font-bold shadow-md"
+          >
+            Logout
+          </button>
+        </div>
+
+        <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
+          NAMMA KARNATAKA
+        </h1>
+
+        <button
+          type="button"
+          onClick={continueToApp}
+          className="mt-10 w-full py-3 rounded-xl bg-blue-600 text-white font-bold shadow-md"
+        >
+          ಮುಂದುವರಿಸಿ
+        </button>
+
+        <p className="mt-2 text-sm font-semibold text-gray-600 dark:text-gray-300">
+          Continue
+        </p>
+
+        {error && (
+          <p className="mt-6 text-sm text-red-600 break-words">
+            {error}
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
-

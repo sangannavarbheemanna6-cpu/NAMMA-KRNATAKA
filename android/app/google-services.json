@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "431406141489",
+    "project_id": "namma-karnataka-f7314",
+    "storage_bucket": "namma-karnataka-f7314.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431406141489:android:f9547b4747798ae9ecc510",
+        "android_client_info": {
+          "package_name": "com.nammakarnataka.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBA5LFZkct9j9ixvtOpX2rrGQL02uB8n_A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
