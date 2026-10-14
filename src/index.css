@@ -1,0 +1,358 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* =========================================
+   BASE STYLES
+========================================= */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", sans-serif;
+    margin: 0;
+    min-width: 320px;
+  }
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  img {
+    max-width: 100%;
+  }
+}
+/* =========================================
+   APP COMPONENTS
+========================================= */
+@layer components {
+  .bottom-nav-item {
+    @apply flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 text-xs font-medium;
+  }
+  .bottom-nav-item.active {
+    @apply text-primary-600;
+  }
+  .bottom-nav-item:not(.active) {
+    @apply text-gray-500;
+  }
+  .feature-card {
+    @apply flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 transition-all active:scale-95 hover:shadow-md;
+  }
+  .section-title {
+    @apply text-lg font-bold text-gray-800 dark:text-gray-100;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+/* =========================================
+   DARK MODE UTILITIES
+========================================= */
+.dark .dark\:bg-gray-800 {
+  background-color: #1f2937;
+}
+.dark .dark\:bg-gray-700 {
+  background-color: #374151;
+}
+.dark .dark\:bg-gray-600 {
+  background-color: #4b5563;
+}
+.dark .dark\:text-gray-100 {
+  color: #f3f4f6;
+}
+.dark .dark\:text-gray-200 {
+  color: #e5e7eb;
+}
+.dark .dark\:text-gray-300 {
+  color: #d1d5db;
+}
+.dark .dark\:text-gray-400 {
+  color: #9ca3af;
+}
+.dark .dark\:border-gray-700 {
+  border-color: #374151;
+}
+.dark .dark\:border-gray-600 {
+  border-color: #4b5563;
+}
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #374151;
+  color: #e5e7eb;
+  border-color: #4b5563;
+}
+.dark ::placeholder {
+  color: #9ca3af;
+}
+/* =========================================
+   MARKET PRICES — NAMMA KARNATAKA
+========================================= */
+.market-prices-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px 16px 100px;
+  color: #172033;
+  background: #f8fafc;
+  box-sizing: border-box;
+}
+.market-prices-page * {
+  box-sizing: border-box;
+}
+.market-prices-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding: 20px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #075e3d, #119b65);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 80, 50, 0.15);
+}
+.market-prices-header > div {
+  min-width: 0;
+}
+.market-prices-header p {
+  margin: 5px 0;
+  color: #e0f2e9;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.market-prices-header h1 {
+  margin: 10px 0;
+  font-size: clamp(22px, 5vw, 30px);
+  line-height: 1.45;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.market-prices-header button {
+  flex-shrink: 0;
+  padding: 9px 12px;
+  color: #075e3d;
+  background: #ffffff;
+  border: 0;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.market-prices-controls {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.market-prices-controls input {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 15px;
+  color: #172033;
+  background: #ffffff;
+  border: 1px solid #dbe3e8;
+  border-radius: 12px;
+  font-size: 16px;
+  outline: none;
+}
+.market-prices-controls input:focus {
+  border-color: #119b65;
+  box-shadow: 0 0 0 3px rgba(17, 155, 101, 0.12);
+}
+.market-prices-filters {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  overflow-x: auto;
+  padding: 2px 0 9px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.market-prices-filters::-webkit-scrollbar {
+  display: none;
+}
+.market-prices-filters button {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  color: #334155;
+  background: #ffffff;
+  border: 1px solid #dbe3e8;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.market-prices-filters button.active {
+  color: #ffffff;
+  background: #087f50;
+  border-color: #087f50;
+}
+.market-prices-controls > button {
+  width: fit-content;
+  min-height: 46px;
+  padding: 12px 16px;
+  color: #ffffff;
+  background: #087f50;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.market-prices-controls > button:disabled {
+  opacity: 0.65;
+}
+.market-prices-results {
+  width: 100%;
+  padding: 16px;
+  overflow-wrap: anywhere;
+  color: #334155;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+  line-height: 1.8;
+}
+.market-prices-results p {
+  margin: 8px 0 14px;
+  line-height: 1.8;
+}
+.market-prices-results a {
+  color: #087f50;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.market-prices-table-wrap {
+  width: 100%;
+  margin: 16px 0;
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.market-prices-table-wrap table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  background: #ffffff;
+  font-size: 14px;
+}
+.market-prices-table-wrap th,
+.market-prices-table-wrap td {
+  padding: 12px 14px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid #e2e8f0;
+}
+.market-prices-table-wrap th {
+  color: #075e3d;
+  background: #ecfdf5;
+  font-weight: 800;
+}
+.market-prices-table-wrap tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+.market-prices-table-wrap tbody tr:last-child td {
+  border-bottom: none;
+}
+/* =========================================
+   MARKET PRICES — DARK MODE
+========================================= */
+.dark .market-prices-page {
+  color: #e5e7eb;
+  background: #111827;
+}
+.dark .market-prices-results {
+  color: #e5e7eb;
+  background: #1f2937;
+  border-color: #374151;
+}
+.dark .market-prices-controls input {
+  color: #e5e7eb;
+  background: #1f2937;
+  border-color: #4b5563;
+}
+.dark .market-prices-filters button {
+  color: #e5e7eb;
+  background: #1f2937;
+  border-color: #4b5563;
+}
+.dark .market-prices-filters button.active {
+  color: #ffffff;
+  background: #087f50;
+  border-color: #087f50;
+}
+.dark .market-prices-table-wrap {
+  border-color: #374151;
+}
+.dark .market-prices-table-wrap table {
+  color: #e5e7eb;
+  background: #1f2937;
+}
+.dark .market-prices-table-wrap th {
+  color: #d1fae5;
+  background: #064e3b;
+  border-color: #374151;
+}
+.dark .market-prices-table-wrap td {
+  border-color: #374151;
+}
+.dark .market-prices-table-wrap tbody tr:nth-child(even) {
+  background: #273449;
+}
+.dark .market-prices-results a {
+  color: #6ee7b7;
+}
+/* =========================================
+   RESPONSIVE LAYOUT
+========================================= */
+@media (min-width: 768px) {
+  .market-prices-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px 100px;
+  }
+  .market-prices-controls {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+  .market-prices-controls input,
+  .market-prices-filters {
+    grid-column: 1 / -1;
+  }
+  .market-prices-controls > button {
+    justify-self: start;
+  }
+  .market-prices-results {
+    padding: 22px;
+  }
+}
+@media (max-width: 380px) {
+  .market-prices-page {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+  .market-prices-header {
+    padding: 16px;
+  }
+  .market-prices-header h1 {
+    font-size: 22px;
+  }
+  .market-prices-results {
+    padding: 12px;
+  }
+}
